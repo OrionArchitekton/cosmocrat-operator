@@ -11,6 +11,9 @@ import { usePostHog } from 'posthog-js/react';
 import { useAuth } from '@/hooks';
 import { usePreviousPath } from '@/hooks/usePreviousPath';
 
+// Operator Plane - P0 cockpit
+import { OperatorPlanePanel } from '@/components/operator-plane';
+
 import {
   AgentSettings,
   GeneralSettings,
@@ -139,6 +142,29 @@ function AppContent() {
               }
             />
 
+            {/* ========== OPERATOR PLANE (P0 COCKPIT) ========== */}
+            <Route
+              path="/"
+              element={
+                <NewDesignScope>
+                  <div className="h-screen w-screen bg-background">
+                    <OperatorPlanePanel />
+                  </div>
+                </NewDesignScope>
+              }
+            />
+            <Route
+              path="/operator-plane"
+              element={
+                <NewDesignScope>
+                  <div className="h-screen w-screen bg-background">
+                    <OperatorPlanePanel />
+                  </div>
+                </NewDesignScope>
+              }
+            />
+
+            {/* ========== LEGACY VIBE KANBAN ROUTES (quarantined) ========== */}
             <Route
               element={
                 <LegacyDesignScope>
@@ -146,7 +172,6 @@ function AppContent() {
                 </LegacyDesignScope>
               }
             >
-              <Route path="/" element={<Projects />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/:projectId" element={<Projects />} />
               <Route
