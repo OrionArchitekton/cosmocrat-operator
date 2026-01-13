@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Operator Plane UI Quarantine Configuration - Runtime",
+  "version": "1.0.0",
+  "mode": "operator-plane-v1",
+  "frozen": "2026-01-12",
+  
+  "quarantine": {
+    "executors": {
+      "enabled": false,
+      "comment": "All direct agent executors are disabled. LLM invocation goes through CCA only.",
+      "disabled_agents": [
+        "claude_code",
+        "codex",
+        "cursor_agent",
+        "copilot",
+        "gemini",
+        "droid",
+        "amp",
+        "opencode",
+        "qwen_code"
+      ]
+    },
+    "mcp": {
+      "server_enabled": false,
+      "client_enabled": false,
+      "comment": "MCP server/client disabled - external task creation bypasses governance"
+    },
+    "chat": {
+      "command_bar_enabled": false,
+      "follow_up_messages_enabled": false,
+      "queued_scratches_enabled": false,
+      "comment": "Chat-first interaction replaced by intent submission"
+    },
+    "automation": {
+      "auto_task_generation_enabled": false,
+      "agent_profiles_enabled": false,
+      "background_agents_enabled": false,
+      "comment": "All autonomous planning/execution surfaces disabled"
+    }
+  },
+  
+  "enabled_features": {
+    "kanban_board": true,
+    "task_cards": true,
+    "task_state_model": true,
+    "task_detail_panel": true,
+    "diff_viewer": true,
+    "file_tree": true,
+    "dev_logs_panel": true,
+    "git_worktree_manager": true,
+    "attempt_model": true,
+    "pr_interface": true,
+    "github_oauth": true
+  },
+  
+  "rewired_features": {
+    "run_button": {
+      "original": "run_agent",
+      "rewired_to": "g2_execute_gate",
+      "endpoint": "/api/execute/authorize"
+    },
+    "diff_panels": {
+      "original": "in_memory_agent_state",
+      "rewired_to": "chronicle_backed_artifacts",
+      "endpoint": "/api/chronicle/events"
+    },
+    "git_actions": {
+      "original": "direct_git_ops",
+      "rewired_to": "approval_gated_intents",
+      "endpoint": "/api/approval/submit"
+    },
+    "pr_interface": {
+      "original": "direct_pr_creation",
+      "rewired_to": "g5_commit_pr_gate",
+      "phase": "P1"
+    }
+  },
+  
+  "api_endpoints": {
+    "intent_submit": {
+      "path": "/api/intent/submit",
+      "method": "POST",
+      "gate": "G1"
+    },
+    "execute_authorize": {
+      "path": "/api/execute/authorize",
+      "method": "POST",
+      "gate": "G2"
+    },
+    "approval_submit": {
+      "path": "/api/approval/submit",
+      "method": "POST",
+      "gate": "G4"
+    },
+    "chronicle_events": {
+      "path": "/api/chronicle/events",
+      "method": "GET",
+      "gate": null
+    }
+  },
+  
+  "enforcement": {
+    "server_side": true,
+    "ui_hiding": true,
+    "route_blocking": true
+  }
+}
