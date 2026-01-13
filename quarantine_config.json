@@ -1,14 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$comment": "Operator Plane UI Quarantine Configuration - Runtime",
-  "version": "1.0.0",
-  "mode": "operator-plane-v1",
-  "frozen": "2026-01-12",
+  "$comment": "Operator Plane UI Quarantine Configuration - Wave 1",
+  "version": "1.1.0",
+  "mode": "operator-plane-v1.1",
+  "frozen": "2026-01-13",
+  "wave": "1",
   
   "quarantine": {
     "executors": {
-      "enabled": false,
-      "comment": "All direct agent executors are disabled. LLM invocation goes through CCA only.",
+      "enabled": true,
+      "single_attempt_only": true,
+      "comment": "WAVE 1: Executors enabled with single-attempt constraint. All execution through Chronicle gates.",
       "disabled_agents": [
         "claude_code",
         "codex",
@@ -24,19 +26,19 @@
     "mcp": {
       "server_enabled": false,
       "client_enabled": false,
-      "comment": "MCP server/client disabled - external task creation bypasses governance"
+      "comment": "WAVE 2: MCP server/client disabled - requires dogfood validation"
     },
     "chat": {
       "command_bar_enabled": false,
       "follow_up_messages_enabled": false,
       "queued_scratches_enabled": false,
-      "comment": "Chat-first interaction replaced by intent submission"
+      "comment": "WAVE 2: Chat features disabled - requires dogfood validation"
     },
     "automation": {
       "auto_task_generation_enabled": false,
       "agent_profiles_enabled": false,
       "background_agents_enabled": false,
-      "comment": "All autonomous planning/execution surfaces disabled"
+      "comment": "auto_task_generation and background_agents are PERMANENTLY DISABLED"
     }
   },
   
@@ -51,7 +53,61 @@
     "git_worktree_manager": true,
     "attempt_model": true,
     "pr_interface": true,
-    "github_oauth": true
+    "github_oauth": true,
+    "start_attempt": true,
+    "attempt_detail_view": true
+  },
+  
+  "wave_1_features": {
+    "projects_tasks_kanban": {
+      "enabled": true,
+      "routes": ["/projects", "/projects/:projectId/tasks"],
+      "ui_copy": "Planning & review only. No execution occurs without explicit start."
+    },
+    "task_attempt_detail": {
+      "enabled": true,
+      "components": ["TaskAttemptPanel", "logs", "diffs"],
+      "ui_copy": "Viewing attempt outputs. All changes require approval."
+    },
+    "start_attempt": {
+      "enabled": true,
+      "constraint": "single_attempt_only",
+      "ui_copy": "Attempt started. Monitor progress – approvals still required at each gate."
+    }
+  },
+  
+  "wave_2_features": {
+    "follow_up_messages": {
+      "enabled": false,
+      "requires": "dogfood_validation"
+    },
+    "agent_profiles_ui": {
+      "enabled": false,
+      "requires": "dogfood_validation"
+    },
+    "mcp_integration": {
+      "enabled": false,
+      "requires": "dogfood_validation"
+    },
+    "chat_command_bar": {
+      "enabled": false,
+      "requires": "dogfood_validation"
+    }
+  },
+  
+  "permanently_disabled": {
+    "auto_task_generation": {
+      "reason": "Violates 'does not create work' invariant",
+      "reference": "PERMANENTLY_DISABLED.md"
+    },
+    "background_agents": {
+      "reason": "Violates 'no background execution' invariant",
+      "reference": "PERMANENTLY_DISABLED.md"
+    },
+    "streaming_chat_execution": {
+      "reason": "Bypasses gate stepwise approval",
+      "reference": "PERMANENTLY_DISABLED.md"
+    }
   },
   
   "rewired_features": {
@@ -103,6 +159,6 @@
   "enforcement": {
     "server_side": true,
     "ui_hiding": true,
-    "route_blocking": true
+    "route_blocking": false
   }
 }
