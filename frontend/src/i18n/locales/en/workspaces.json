@@ -1,0 +1,19 @@
+{
+  "title": "Workspaces",
+  "subtitle": "Execution contexts where work happens",
+  "empty": {
+    "title": "No workspaces yet",
+    "description": "Create a workspace to define where work will happen (code, systems, or data)."
+  },
+  "header": {
+    "label": "Workspace",
+    "typeLabel": "Repo Workspace"
+  },
+  "tooltip": "Workspace = repo or system context where work happens",
+  "tabs": {
+    "overview": "Overview",
+    "projectMode": "Project Mode",
+    "attempts": "Attempts",
+    "settings": "Settings"
+  }
+}

@@ -32,6 +32,7 @@ import {
   PencilSimpleIcon,
   ArrowUpIcon,
   HighlighterIcon,
+  FolderIcon,
 } from '@phosphor-icons/react';
 import { useDiffViewStore } from '@/stores/useDiffViewStore';
 import { useUiPreferencesStore } from '@/stores/useUiPreferencesStore';
@@ -80,6 +81,7 @@ export interface ActionVisibilityContext {
   isChangesMode: boolean;
   isLogsMode: boolean;
   isPreviewMode: boolean;
+  isProjectMode: boolean;
   isSidebarVisible: boolean;
   isMainPanelVisible: boolean;
   isGitPanelVisible: boolean;
@@ -495,6 +497,22 @@ export const Actions = {
     },
   },
 
+  ToggleProjectMode: {
+    id: 'toggle-project-mode',
+    label: () =>
+      useLayoutStore.getState().isProjectMode
+        ? 'Hide Project Mode'
+        : 'Show Project Mode',
+    icon: FolderIcon,
+    requiresTarget: false,
+    isVisible: () => true, // Always visible for Project Mode testing
+    isActive: (ctx) => ctx.isProjectMode,
+    isEnabled: () => true, // Always enabled for Project Mode testing
+    execute: () => {
+      useLayoutStore.getState().toggleProjectMode();
+    },
+  },
+
   // === Navigation Actions ===
   OpenInOldUI: {
     id: 'open-in-old-ui',
@@ -826,6 +844,7 @@ export const NavbarActionGroups = {
     Actions.ToggleChangesMode,
     Actions.ToggleLogsMode,
     Actions.TogglePreviewMode,
+    Actions.ToggleProjectMode,
     Actions.ToggleGitPanel,
   ] as NavbarItem[],
 };

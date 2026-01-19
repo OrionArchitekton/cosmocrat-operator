@@ -5,7 +5,7 @@
  * Truth comes from Chronicle events.
  */
 
-import { CheckCircle2, XCircle, Clock, Circle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GateStatus as GateStatusType, GateStates } from '@/hooks/useOperatorPlane';
 

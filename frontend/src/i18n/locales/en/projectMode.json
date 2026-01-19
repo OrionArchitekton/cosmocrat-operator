@@ -1,0 +1,209 @@
+{
+  "title": "Project Mode",
+  "subtitle": "Governed initiatives inside this workspace. Humans approve intent. The system executes. Chronicle records proof.",
+  "projectSelector": {
+    "label": "Active Project",
+    "placeholder": "Select a project (initiative)",
+    "empty": "No projects yet. Import a roadmap or checklist to create a project."
+  },
+  "tickets": {
+    "title": "Tickets",
+    "status": {
+      "queued": "QUEUED",
+      "ready": "READY",
+      "executing": "EXECUTING",
+      "reviewRequired": "REVIEW REQUIRED (G3)",
+      "done": "DONE",
+      "blocked": "BLOCKED"
+    },
+    "dependencyHint": {
+      "waiting": "Waiting on: {{ticketId}}",
+      "satisfied": "All dependencies satisfied"
+    }
+  },
+  "readiness": {
+    "title": "What Can Happen Next",
+    "nextRunnable": {
+      "title": "Recommended Next Ticket",
+      "helpText": "This ticket has no unmet dependencies and is safe to start."
+    },
+    "eligibleTickets": {
+      "title": "Eligible Tickets",
+      "subtitle": "Multiple tickets are eligible. Select one to start.",
+      "recommended": "Recommended",
+      "rank": "Rank {{rank}}",
+      "whyEligible": "Why eligible",
+      "whyEligibleNote": "Evidence used for ranking. Human decides execution.",
+      "reasons": {
+        "noDeps": "No dependencies",
+        "oneDep": "Only 1 dependency",
+        "deps": "{{count}} dependencies",
+        "immediate": "Can start immediately"
+      }
+    },
+    "pendingApprovals": {
+      "title": "Pending Human Approvals",
+      "empty": "No approvals pending.",
+      "gates": {
+        "g2": "G2 · Start Execution",
+        "g3": "G3 · Review Outcome",
+        "g4": "G4 · Apply Changes",
+        "g5": "G5 · Create Commit",
+        "g6": "G6 · Merge to Main"
+      }
+    },
+    "explanations": {
+      "title": "Why Tickets Are Not Runnable",
+      "footer": "Explanations are derived from Chronicle events."
+    },
+    "laneCapacity": {
+      "title": "Lane Capacity",
+      "subtitle": "Concurrency limits per execution lane.",
+      "lane": "Lane",
+      "limit": "Limit",
+      "active": "Active",
+      "remaining": "Remaining",
+      "atCapacity": "At Capacity",
+      "available": "Available",
+      "noLanes": "No lane limits configured."
+    },
+    "backpressure": {
+      "title": "Backpressure Active",
+      "body": "New executions are paused to protect system stability.",
+      "resumedTitle": "System Stable",
+      "resumedBody": "System is operating normally. Executions can proceed.",
+      "signals": {
+        "activeAttempts": "Active Attempts",
+        "recentFailures": "Recent Failures",
+        "errorStreak": "Error Streak",
+        "avgLatency": "Avg Latency"
+      },
+      "triggeredBy": "Triggered by"
+    }
+  },
+  "controls": {
+    "authorizeExecute": "Authorize & Execute (G2)",
+    "authorizeExecuteConfirmation": "You are authorizing execution of one bounded attempt. No changes will be applied without further approval.",
+    "executingBanner": "One attempt is currently running. Complete or review it before starting another.",
+    "reviewOutcome": "Review Outcome",
+    "cancel": "Cancel",
+    "authorize": "Authorize Start"
+  },
+  "attempt": {
+    "title": "Latest Attempt",
+    "receiptId": "Receipt ID",
+    "verdict": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "timedOut": "Timed Out"
+    }
+  },
+  "governance": {
+    "chronicleLabel": "Chronicle",
+    "gatesLabel": "Gates",
+    "modeLabel": "Mode",
+    "singleAttempt": "Single-Attempt Only",
+    "recording": "Recording",
+    "enforced": "Enforced",
+    "footer": "All state shown here is derived from Chronicle receipts."
+  },
+  "footer": "Humans decide. The system executes. Chronicle remembers.",
+  "import": {
+    "title": "Import Plan",
+    "description": "Import a roadmap or checklist to create tickets.",
+    "formatLabel": "Format",
+    "formats": {
+      "conductor_md": "Conductor Markdown",
+      "plan_md": "Plan Markdown",
+      "yaml": "YAML"
+    },
+    "contentLabel": "Plan Content",
+    "contentPlaceholder": "Paste your plan content here...",
+    "importing": "Importing...",
+    "importButton": "Import Plan"
+  },
+  "expansion": {
+    "title": "Review Expansion",
+    "description": "Review the proposed ticket DAG before approval.",
+    "ticketsPreview": "Tickets Preview",
+    "warnings": "Warnings",
+    "noWarnings": "No warnings.",
+    "dagHash": "DAG Hash",
+    "approving": "Approving...",
+    "approveButton": "Approve Expansion",
+    "rejectButton": "Reject"
+  },
+  "parallelSets": {
+    "title": "Parallel Set (Proposed)",
+    "subtitle": "Parallel execution requires explicit approval.",
+    "ticketsIncluded": "Tickets Included",
+    "policyMode": "Policy Mode",
+    "maxConcurrent": "Max Concurrent",
+    "approve": "Approve Parallel Set",
+    "reject": "Reject",
+    "execute": "Execute Approved Set",
+    "warningNoteRequired": "A note is required when warnings exist.",
+    "approving": "Approving...",
+    "rejecting": "Rejecting...",
+    "noProposal": "No parallel set proposed.",
+    "proposeNew": "Propose Parallel Set",
+    "proposing": "Proposing...",
+    "approved": "Parallel set approved.",
+    "rejected": "Parallel set rejected.",
+    "rationale": "Why This Set",
+    "warnings": "Warnings",
+    "noWarnings": "No warnings.",
+    "safetyChecks": {
+      "title": "Safety Checks",
+      "passed": "Passed",
+      "failed": "Failed",
+      "checks": {
+        "deps_satisfied": "Dependencies satisfied",
+        "no_internal_deps": "No internal dependencies",
+        "scope_known": "Scopes are known",
+        "path_disjoint": "Paths do not overlap",
+        "no_active_attempts": "No active attempts"
+      }
+    },
+    "safetySummary": {
+      "title": "Why This Is Safe",
+      "subtitle": "Evidence used to recommend safety. Humans decide.",
+      "overall": {
+        "pass": "All Checks Passed",
+        "warn": "Warnings Present",
+        "fail": "Safety Check Failed"
+      },
+      "categories": {
+        "deps_satisfied": "Dependencies",
+        "no_internal_deps": "Internal Dependencies",
+        "scope_known": "Scope",
+        "path_disjoint": "Path Disjointness",
+        "lane_capacity": "Lane Capacity",
+        "backpressure": "System Load",
+        "no_active_attempt": "Active Attempts",
+        "policy": "Policy"
+      },
+      "status": {
+        "pass": "Pass",
+        "warn": "Warning",
+        "fail": "Fail"
+      },
+      "evidence": "Evidence",
+      "noExplanations": "No safety checks performed.",
+      "disclaimer": "This is the evidence used to recommend safety. The human operator makes the final decision."
+    },
+    "approvalNote": {
+      "label": "Approval Note",
+      "placeholder": "Optional note for approval record..."
+    },
+    "rejectionNote": {
+      "label": "Rejection Reason",
+      "placeholder": "Reason for rejection (required)..."
+    },
+    "banner": {
+      "proposed": "A parallel set has been proposed. Review and approve to enable parallel execution.",
+      "approved": "Parallel set approved. Click 'Execute Approved Set' to start.",
+      "noEligible": "Not enough eligible tickets for parallel execution."
+    }
+  }
+}

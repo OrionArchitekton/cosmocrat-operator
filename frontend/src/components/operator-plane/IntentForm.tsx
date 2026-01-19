@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, Send } from 'lucide-react';
 
 interface IntentFormProps {
-  onSubmit: (description: string, targetFiles: string[], worktree: string, branch: string) => Promise<void>;
+  onSubmit: (description: string, targetFiles: string[], worktree: string, branch: string) => Promise<unknown>;
   isLoading: boolean;
   disabled?: boolean;
   defaultWorktree?: string;

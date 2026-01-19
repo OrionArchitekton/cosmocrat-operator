@@ -9,6 +9,7 @@ type LayoutState = {
   isChangesMode: boolean;
   isLogsMode: boolean;
   isPreviewMode: boolean;
+  isProjectMode: boolean;
 
   // Preview refresh coordination
   previewRefreshKey: number;
@@ -20,11 +21,13 @@ type LayoutState = {
   toggleChangesMode: () => void;
   toggleLogsMode: () => void;
   togglePreviewMode: () => void;
+  toggleProjectMode: () => void;
 
   // Setters for direct state updates
   setChangesMode: (value: boolean) => void;
   setLogsMode: (value: boolean) => void;
   setPreviewMode: (value: boolean) => void;
+  setProjectMode: (value: boolean) => void;
   setSidebarVisible: (value: boolean) => void;
   setMainPanelVisible: (value: boolean) => void;
 
@@ -47,6 +50,7 @@ export const useLayoutStore = create<LayoutState>()(
       isChangesMode: false,
       isLogsMode: false,
       isPreviewMode: false,
+      isProjectMode: false,
       previewRefreshKey: 0,
 
       toggleSidebar: () =>
@@ -67,12 +71,13 @@ export const useLayoutStore = create<LayoutState>()(
         const newChangesMode = !isChangesMode;
 
         if (newChangesMode) {
-          // Changes, logs, and preview are mutually exclusive
+          // Changes, logs, preview, and project are mutually exclusive
           // Auto-hide sidebar when entering changes mode (unless screen is wide enough)
           set({
             isChangesMode: true,
             isLogsMode: false,
             isPreviewMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
@@ -89,12 +94,13 @@ export const useLayoutStore = create<LayoutState>()(
         const newLogsMode = !isLogsMode;
 
         if (newLogsMode) {
-          // Logs, changes, and preview are mutually exclusive
+          // Logs, changes, preview, and project are mutually exclusive
           // Auto-hide sidebar when entering logs mode (unless screen is wide enough)
           set({
             isLogsMode: true,
             isChangesMode: false,
             isPreviewMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
@@ -111,12 +117,13 @@ export const useLayoutStore = create<LayoutState>()(
         const newPreviewMode = !isPreviewMode;
 
         if (newPreviewMode) {
-          // Preview, changes, and logs are mutually exclusive
+          // Preview, changes, logs, and project are mutually exclusive
           // Auto-hide sidebar when entering preview mode (unless screen is wide enough)
           set({
             isPreviewMode: true,
             isChangesMode: false,
             isLogsMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
@@ -128,12 +135,36 @@ export const useLayoutStore = create<LayoutState>()(
         }
       },
 
+      toggleProjectMode: () => {
+        const { isProjectMode } = get();
+        const newProjectMode = !isProjectMode;
+
+        if (newProjectMode) {
+          // Project, changes, logs, and preview are mutually exclusive
+          // Auto-hide sidebar when entering project mode (unless screen is wide enough)
+          set({
+            isProjectMode: true,
+            isChangesMode: false,
+            isLogsMode: false,
+            isPreviewMode: false,
+            isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
+          });
+        } else {
+          // Auto-show sidebar when exiting project mode
+          set({
+            isProjectMode: false,
+            isSidebarVisible: true,
+          });
+        }
+      },
+
       setChangesMode: (value) => {
         if (value) {
           set({
             isChangesMode: true,
             isLogsMode: false,
             isPreviewMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
@@ -147,6 +178,7 @@ export const useLayoutStore = create<LayoutState>()(
             isLogsMode: true,
             isChangesMode: false,
             isPreviewMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
@@ -160,10 +192,25 @@ export const useLayoutStore = create<LayoutState>()(
             isPreviewMode: true,
             isChangesMode: false,
             isLogsMode: false,
+            isProjectMode: false,
             isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
           });
         } else {
           set({ isPreviewMode: false });
+        }
+      },
+
+      setProjectMode: (value) => {
+        if (value) {
+          set({
+            isProjectMode: true,
+            isChangesMode: false,
+            isLogsMode: false,
+            isPreviewMode: false,
+            isSidebarVisible: isWideScreen() ? get().isSidebarVisible : false,
+          });
+        } else {
+          set({ isProjectMode: false });
         }
       },
 
@@ -179,6 +226,7 @@ export const useLayoutStore = create<LayoutState>()(
           isChangesMode: false,
           isLogsMode: false,
           isPreviewMode: false,
+          isProjectMode: false,
         }),
     }),
     {
@@ -203,7 +251,8 @@ export const useIsGitPanelVisible = () =>
 export const useIsChangesMode = () => useLayoutStore((s) => s.isChangesMode);
 export const useIsLogsMode = () => useLayoutStore((s) => s.isLogsMode);
 export const useIsPreviewMode = () => useLayoutStore((s) => s.isPreviewMode);
+export const useIsProjectMode = () => useLayoutStore((s) => s.isProjectMode);
 
-// Derived selector: true when right main panel content is visible (Changes/Logs/Preview)
+// Derived selector: true when right main panel content is visible (Changes/Logs/Preview/Project)
 export const useIsRightMainPanelVisible = () =>
-  useLayoutStore((s) => s.isChangesMode || s.isLogsMode || s.isPreviewMode);
+  useLayoutStore((s) => s.isChangesMode || s.isLogsMode || s.isPreviewMode || s.isProjectMode);

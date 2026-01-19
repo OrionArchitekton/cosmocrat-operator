@@ -130,7 +130,7 @@ function DiffCard({ patch }: DiffCardProps) {
 export function ArtifactsToDiffs(artifacts: ExecutionResult['artifacts'] | null) {
   if (!artifacts?.patches) return [];
   
-  return (artifacts.patches as PatchArtifact[]).map((patch, index) => ({
+  return (artifacts.patches as PatchArtifact[]).map((patch) => ({
     oldPath: patch.operation === 'create' ? null : patch.filePath,
     newPath: patch.operation === 'delete' ? null : patch.filePath,
     change: patch.operation === 'create' ? 'added' as const :

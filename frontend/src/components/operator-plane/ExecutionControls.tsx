@@ -18,14 +18,13 @@ import {
   FileCode,
   MessageSquare
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import type { GateStates } from '@/hooks/useOperatorPlane';
 
 interface ExecutionControlsProps {
   gates: GateStates;
-  onExecute: () => Promise<void>;
-  onApprove: (comment?: string) => Promise<void>;
-  onReject: (comment?: string) => Promise<void>;
+  onExecute: () => Promise<unknown>;
+  onApprove: (comment?: string) => Promise<unknown>;
+  onReject: (comment?: string) => Promise<unknown>;
   isLoading: boolean;
   error: string | null;
   artifactsCount?: number;

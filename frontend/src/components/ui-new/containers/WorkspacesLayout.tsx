@@ -30,6 +30,15 @@ import { useRenameBranch } from '@/hooks/useRenameBranch';
 import { usePush } from '@/hooks/usePush';
 import { repoApi } from '@/lib/api';
 import { ConfirmDialog } from '@/components/ui-new/dialogs/ConfirmDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { ForcePushDialog } from '@/components/dialogs/git/ForcePushDialog';
 import { useDiffStream } from '@/hooks/useDiffStream';
 import { useTask } from '@/hooks/useTask';
@@ -44,6 +53,8 @@ import {
   useLayoutStore,
   useIsRightMainPanelVisible,
 } from '@/stores/useLayoutStore';
+import { ProjectModePanel, PlanImportDialog } from '@/components/project-mode';
+import { approveTicketG3, applyTicketG4 } from '@/api/project-mode';
 import { useDiffViewStore } from '@/stores/useDiffViewStore';
 import { CommandBarDialog } from '@/components/ui-new/dialogs/CommandBarDialog';
 import { useCommandBarShortcut } from '@/hooks/useCommandBarShortcut';
@@ -271,6 +282,8 @@ export function WorkspacesLayout() {
     startNewSession,
   } = useWorkspaceContext();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [reviewAttempt, setReviewAttempt] = useState<{ ticketId: string; attemptId: string } | null>(null);
 
   // Layout state from store
   const {
@@ -280,6 +293,7 @@ export function WorkspacesLayout() {
     isChangesMode,
     isLogsMode,
     isPreviewMode,
+    isProjectMode,
     setChangesMode,
     setLogsMode,
     resetForCreateMode,
@@ -783,6 +797,16 @@ export function WorkspacesLayout() {
             {isPreviewMode && (
               <PreviewBrowserContainer attemptId={selectedWorkspace?.id} />
             )}
+            {isProjectMode && (
+              <ProjectModePanel
+                projectId={selectedWorkspaceTask?.project_id || 'default-project'}
+                onNavigateToAttempt={(ticketId, attemptId) => {
+                  console.log('Navigate to attempt:', ticketId, attemptId);
+                  setReviewAttempt({ ticketId, attemptId });
+                }}
+                onOpenImportDialog={() => setIsImportDialogOpen(true)}
+              />
+            )}
           </div>
         </Allotment.Pane>
 
@@ -849,6 +873,99 @@ export function WorkspacesLayout() {
     <div className="flex flex-col h-screen">
       <NavbarContainer />
       {renderContent()}
+
+      {/* Project Mode Import Dialog */}
+      <PlanImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        projectId={selectedWorkspaceTask?.project_id || 'default-project'}
+        onSuccess={(planRefId) => {
+          console.log('Plan imported:', planRefId);
+          setIsImportDialogOpen(false);
+        }}
+      />
+
+      {/* G3 Review Dialog */}
+      <Dialog open={!!reviewAttempt} onOpenChange={() => setReviewAttempt(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              ✅ G3 Review: Execution Complete
+            </DialogTitle>
+            <DialogDescription>
+              Review the attempt outcome before approving or rejecting.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Ticket:</span>
+                <div className="font-mono font-medium">{reviewAttempt?.ticketId}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Attempt:</span>
+                <div className="font-mono font-medium text-xs">{reviewAttempt?.attemptId}</div>
+              </div>
+            </div>
+            
+            <div className="px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <div className="text-sm font-medium text-green-700 dark:text-green-300">
+                Verdict: SUCCESS
+              </div>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                Mock execution completed successfully. Ready for G4 approval.
+              </p>
+            </div>
+            
+            <div className="text-xs text-muted-foreground italic">
+              In production, this dialog would show diffs, logs, and test results.
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReviewAttempt(null)}>
+              Close
+            </Button>
+            <Button 
+              onClick={async () => {
+                if (!reviewAttempt) return;
+                try {
+                  const projectId = selectedWorkspaceTask?.project_id || 'default-project';
+                  
+                  // G3: Approve review
+                  console.log('G3: Approving review...');
+                  const g3Result = await approveTicketG3(projectId, reviewAttempt.ticketId);
+                  console.log('G3 Approval result:', g3Result);
+                  
+                  if (!g3Result.success) {
+                    alert(`G3 approval failed: ${g3Result.message}`);
+                    return;
+                  }
+                  
+                  // G4: Apply changes (auto-complete for mock execution)
+                  console.log('G4: Applying changes...');
+                  const g4Result = await applyTicketG4(projectId, reviewAttempt.ticketId);
+                  console.log('G4 Apply result:', g4Result);
+                  
+                  if (g4Result.success) {
+                    setReviewAttempt(null);
+                    // Success! The ticket is now DONE
+                  } else {
+                    alert(`G4 apply failed: ${g4Result.message}`);
+                  }
+                } catch (err) {
+                  console.error('Approval error:', err);
+                  alert(`Approval failed: ${err}`);
+                }
+              }}
+              className="gap-2"
+            >
+              Approve & Complete (G3+G4)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

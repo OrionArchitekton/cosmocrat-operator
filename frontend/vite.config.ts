@@ -65,8 +65,8 @@ export default defineConfig({
     port: parseInt(process.env.FRONTEND_PORT || "5173"),
     proxy: {
       "/api": {
-        // Operator Plane adapter (default 8081) or override via VITE_OPERATOR_PLANE_API_URL
-        target: process.env.VITE_OPERATOR_PLANE_API_URL?.replace('/api', '') || `http://localhost:${process.env.BACKEND_PORT || "8081"}`,
+        // Operator Plane adapter (default 8080) or override via VITE_OPERATOR_PLANE_API_URL
+        target: process.env.VITE_OPERATOR_PLANE_API_URL?.replace('/api', '') || `http://localhost:${process.env.BACKEND_PORT || "8080"}`,
         changeOrigin: true,
         ws: true,
         rewrite: (path) => path, // Keep /api prefix

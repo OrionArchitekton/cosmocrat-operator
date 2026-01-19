@@ -10,13 +10,12 @@
  * After every mutation, refresh from /api/chronicle/events.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   submitIntent,
   authorizeExecution,
   submitApproval,
-  getIntentStatus,
   getChronicleEvents,
   getOperatorId,
   getSessionId,
@@ -25,10 +24,8 @@ import {
   type ExecutionRequest,
   type ExecutionResult,
   type ApprovalRequest,
-  type ApprovalReceipt,
   type ApprovalDecision,
   type ChronicleEvent,
-  type IntentStatus,
 } from '@/api/operator-plane';
 
 // ============================================================
