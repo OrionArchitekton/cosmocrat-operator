@@ -1,4 +1,9 @@
-name: Remote Deploy Prod
+# ⚠️ WORKFLOW DISABLED - REPOSITORY QUARANTINED
+# See README_QUARANTINED.md for details
+# Date: 2026-01-20
+# Reason: R1 Operator Plane Split - authority isolation
+
+name: Remote Deploy Prod (DISABLED)
 
 on:
   workflow_dispatch:
@@ -7,6 +12,7 @@ jobs:
   run-remote-deploy:
     name: Deploy Remote Prod
     runs-on: ubuntu-latest
+    if: false  # QUARANTINED: Deployments disabled
     permissions:
       contents: read
     steps:

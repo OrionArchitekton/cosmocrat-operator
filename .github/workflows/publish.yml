@@ -1,4 +1,9 @@
-name: Publish to npm
+# ⚠️ WORKFLOW DISABLED - REPOSITORY QUARANTINED
+# See README_QUARANTINED.md for details
+# Date: 2026-01-20
+# Reason: R1 Operator Plane Split - authority isolation
+
+name: Publish to npm (DISABLED)
 
 on:
   release:
@@ -27,8 +32,8 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Only run if this was converted from a pre-release
-    if: github.event.release.prerelease == false
+    # QUARANTINED: Publishing disabled
+    if: false
     steps:
       - uses: actions/checkout@v4
         with:
