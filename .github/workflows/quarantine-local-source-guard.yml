@@ -1,3 +1,6 @@
+# PR-16 enforcement promotion note:
+# Enforced-default mode enabled on 2026-02-19 after stable window since PR-15 merge (ded4253...).
+# Stable-window evidence must be referenced in the PR-16 description.
 name: Quarantine Local Source Guard
 
 on:
@@ -13,15 +16,15 @@ on:
       - ".github/workflows/quarantine-local-source-guard.yml"
   workflow_dispatch:
     inputs:
-      enforced_mode:
-        description: "Run enforced preview mode (forbidden local source)"
+      alert_only:
+        description: "Break-glass: run alert-only mode (non-blocking)"
         required: false
         default: false
         type: boolean
 
 jobs:
-  alert:
-    name: Alert Mode (Non-Blocking)
+  guard:
+    name: Quarantine Local Source Guard
     runs-on: ubuntu-latest
 
     steps:
@@ -34,29 +37,51 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run quarantine local-source guard (alert)
+      - name: Resolve execution mode
+        id: mode
+        shell: bash
+        run: |
+          mode="forbidden"
+          mode_reason="enforced_default"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.alert_only }}" == "true" ]]; then
+            mode="alert"
+            mode_reason="break_glass_alert_only"
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "mode_reason=$mode_reason" >> "$GITHUB_OUTPUT"
+
+      - name: Run quarantine local-source guard
         id: guard
         shell: bash
         run: |
           set +e
           mkdir -p artifacts
           node scripts/check-quarantine-local-source.js \
-            --mode alert \
+            --mode "${{ steps.mode.outputs.mode }}" \
             --receipt-out artifacts/quarantine_local_source_guard_receipt.json \
             --repo "$GITHUB_REPOSITORY" \
             --workflow "$GITHUB_WORKFLOW"
           rc=$?
           echo "guard_exit_code=$rc" >> "$GITHUB_OUTPUT"
-          if [ "$rc" -ne 0 ]; then
-            echo "::warning::Local-source guard exited non-zero in alert mode (non-blocking)."
-          fi
+          echo "::notice::Guard mode=${{ steps.mode.outputs.mode }} reason=${{ steps.mode.outputs.mode_reason }} exit_code=$rc"
           node - <<'NODE'
           const fs = require('node:fs');
 
-          const raw = fs.readFileSync('artifacts/quarantine_local_source_guard_receipt.json', 'utf8');
-          const payload = JSON.parse(raw);
-          const status = String(payload.status || 'unknown');
-          const usageCount = Number(payload.usage_count || 0);
+          const receiptPath = 'artifacts/quarantine_local_source_guard_receipt.json';
+          let status = 'receipt_missing';
+          let usageCount = 0;
+
+          if (fs.existsSync(receiptPath)) {
+            try {
+              const raw = fs.readFileSync(receiptPath, 'utf8');
+              const payload = JSON.parse(raw);
+              status = String(payload.status || 'unknown');
+              usageCount = Number(payload.usage_count || 0);
+            } catch (_err) {
+              status = 'receipt_invalid';
+              usageCount = 0;
+            }
+          }
 
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `status=${status}\n`, 'utf8');
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `usage_count=${usageCount}\n`, 'utf8');
@@ -65,7 +90,6 @@ jobs:
             process.stdout.write(`::warning::Quarantine local-source guard status=${status}, usage_count=${usageCount}\n`);
           }
           NODE
-          exit 0
 
       - name: Run guard contract tests
         run: |
@@ -75,8 +99,20 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: quarantine-local-source-guard-alert
+          name: quarantine-local-source-guard-${{ steps.mode.outputs.mode }}
           path: artifacts/quarantine_local_source_guard_receipt.json
+
+      - name: Apply gate result
+        if: always()
+        shell: bash
+        run: |
+          mode="${{ steps.mode.outputs.mode }}"
+          rc="${{ steps.guard.outputs.guard_exit_code }}"
+          if [ "$mode" = "alert" ]; then
+            echo "::warning::Break-glass alert_only=true active; forcing non-blocking outcome."
+            exit 0
+          fi
+          exit "$rc"
 
       - name: Summary
         if: always()
@@ -85,42 +121,5 @@ jobs:
           echo "quarantine_local_source_guard_status=${{ steps.guard.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"
           echo "quarantine_local_source_usage_count=${{ steps.guard.outputs.usage_count }}" >> "$GITHUB_STEP_SUMMARY"
           echo "quarantine_local_source_guard_exit_code=${{ steps.guard.outputs.guard_exit_code }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "mode=alert (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
-
-  enforced-preview:
-    name: Enforced Preview (Opt-In)
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.enforced_mode == true }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: ./.github/actions/setup-node
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run quarantine local-source guard (forbidden)
-        shell: bash
-        env:
-          QUARANTINE_LOCAL_SOURCE: forbidden
-        run: |
-          mkdir -p artifacts
-          node scripts/check-quarantine-local-source.js \
-            --mode forbidden \
-            --receipt-out artifacts/quarantine_local_source_guard_receipt.json \
-            --repo "$GITHUB_REPOSITORY" \
-            --workflow "$GITHUB_WORKFLOW"
-
-      - name: Run guard contract tests
-        run: |
-          node --test scripts/test-check-quarantine-local-source.js scripts/test-quarantine-deprecation-contract.js
-
-      - name: Upload guard artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: quarantine-local-source-guard-enforced-preview
-          path: artifacts/quarantine_local_source_guard_receipt.json
+          echo "mode=${{ steps.mode.outputs.mode }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "mode_reason=${{ steps.mode.outputs.mode_reason }}" >> "$GITHUB_STEP_SUMMARY"
