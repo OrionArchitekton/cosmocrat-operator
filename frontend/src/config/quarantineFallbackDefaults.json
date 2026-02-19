@@ -1,0 +1,32 @@
+{
+  "mode": "operator-plane-v1",
+  "executors": {
+    "enabled": false,
+    "singleAttemptOnly": true,
+    "disabledAgents": [
+      "claude_code",
+      "codex",
+      "cursor_agent",
+      "copilot",
+      "gemini",
+      "droid",
+      "amp",
+      "opencode",
+      "qwen_code"
+    ]
+  },
+  "mcp": {
+    "serverEnabled": false,
+    "clientEnabled": false
+  },
+  "chat": {
+    "commandBarEnabled": false,
+    "followUpMessagesEnabled": false,
+    "queuedScratchesEnabled": false
+  },
+  "automation": {
+    "autoTaskGenerationEnabled": false,
+    "agentProfilesEnabled": false,
+    "backgroundAgentsEnabled": false
+  }
+}
