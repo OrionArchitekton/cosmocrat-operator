@@ -10,9 +10,20 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, AlertCircle, CheckCircle2, HelpCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Clock,
+  AlertCircle,
+  CheckCircle2,
+  HelpCircle,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ReadinessBundle, PendingApproval, EligibleTicket } from '@/api/project-mode';
+import type {
+  ReadinessBundle,
+  PendingApproval,
+  EligibleTicket,
+} from '@/api/project-mode';
 import { LaneCapacityPanel } from './LaneCapacityPanel';
 import { BackpressureBanner } from './BackpressureBanner';
 
@@ -45,7 +56,7 @@ export function ReadinessPanel({
 
   // Get tickets that have explanations (blocked/waiting)
   const blockedTickets = Object.entries(explanations).filter(
-    ([_, reasons]) => reasons.length > 0
+    ([, reasons]) => reasons.length > 0
   );
 
   return (
@@ -121,10 +132,7 @@ export function ReadinessPanel({
 
           <div className="space-y-2 text-xs">
             {blockedTickets.slice(0, 5).map(([ticketId, reasons]) => (
-              <div
-                key={ticketId}
-                className="px-3 py-2 bg-muted/30 rounded-lg"
-              >
+              <div key={ticketId} className="px-3 py-2 bg-muted/30 rounded-lg">
                 <div className="font-mono font-medium">{ticketId}</div>
                 <ul className="mt-1 text-muted-foreground list-disc list-inside">
                   {reasons.slice(0, 2).map((reason, i) => (
@@ -185,7 +193,9 @@ function EligibleTicketCard({
             >
               {eligible.rank}
             </span>
-            <span className="font-mono text-sm font-medium">{eligible.ticketId}</span>
+            <span className="font-mono text-sm font-medium">
+              {eligible.ticketId}
+            </span>
           </div>
           {isRecommended && (
             <span className="text-xs font-semibold text-green-600 dark:text-green-400">
@@ -210,9 +220,13 @@ function EligibleTicketCard({
             ) : (
               <ChevronRight className="h-3 w-3" />
             )}
-            <span>{t('readiness.eligibleTickets.whyEligible', { defaultValue: 'Why eligible' })}</span>
+            <span>
+              {t('readiness.eligibleTickets.whyEligible', {
+                defaultValue: 'Why eligible',
+              })}
+            </span>
           </button>
-          
+
           {showWhyEligible && (
             <div className="px-3 pb-2 text-xs">
               <ul className="space-y-1 ml-4">
@@ -224,8 +238,9 @@ function EligibleTicketCard({
                 ))}
               </ul>
               <p className="mt-2 text-[10px] text-muted-foreground/70 italic">
-                {t('readiness.eligibleTickets.whyEligibleNote', { 
-                  defaultValue: 'Evidence used for ranking. Human decides execution.' 
+                {t('readiness.eligibleTickets.whyEligibleNote', {
+                  defaultValue:
+                    'Evidence used for ranking. Human decides execution.',
                 })}
               </p>
             </div>
@@ -264,9 +279,12 @@ function PendingApprovalCard({
       <div className="flex items-center gap-2">
         {icon}
         <span className="text-xs font-medium">
-          {t(`readiness.pendingApprovals.gates.${approval.gate.toLowerCase()}`, {
-            defaultValue: approval.gate,
-          })}
+          {t(
+            `readiness.pendingApprovals.gates.${approval.gate.toLowerCase()}`,
+            {
+              defaultValue: approval.gate,
+            }
+          )}
         </span>
       </div>
       <div className="flex items-center justify-between mt-1">

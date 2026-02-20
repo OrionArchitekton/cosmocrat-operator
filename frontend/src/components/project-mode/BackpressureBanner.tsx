@@ -8,7 +8,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Activity, Clock, XCircle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Activity, Clock, XCircle } from 'lucide-react';
 import { BackpressureStatus } from '@/api/project-mode';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +17,10 @@ interface BackpressureBannerProps {
   className?: string;
 }
 
-export function BackpressureBanner({ backpressure, className }: BackpressureBannerProps) {
+export function BackpressureBanner({
+  backpressure,
+  className,
+}: BackpressureBannerProps) {
   const { t } = useTranslation('projectMode');
 
   // Don't render if no backpressure data or not active
@@ -25,7 +28,7 @@ export function BackpressureBanner({ backpressure, className }: BackpressureBann
     return null;
   }
 
-  const { signals, triggeredBy, reason, since } = backpressure;
+  const { signals, triggeredBy, since } = backpressure;
 
   // Format the since timestamp if available
   const formattedSince = since ? formatTimeAgo(since) : null;
@@ -96,7 +99,11 @@ export function BackpressureBanner({ backpressure, className }: BackpressureBann
           <SignalCard
             icon={<Clock className="h-4 w-4" />}
             label={t('readiness.backpressure.signals.avgLatency')}
-            value={signals.avgLatencyMs > 0 ? `${Math.round(signals.avgLatencyMs)}ms` : '-'}
+            value={
+              signals.avgLatencyMs > 0
+                ? `${Math.round(signals.avgLatencyMs)}ms`
+                : '-'
+            }
             isTriggered={triggeredBy?.includes('avg_latency')}
           />
         </div>
