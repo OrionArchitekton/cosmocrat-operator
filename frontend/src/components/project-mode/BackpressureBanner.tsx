@@ -17,7 +17,10 @@ interface BackpressureBannerProps {
   className?: string;
 }
 
-export function BackpressureBanner({ backpressure, className }: BackpressureBannerProps) {
+export function BackpressureBanner({
+  backpressure,
+  className,
+}: BackpressureBannerProps) {
   const { t } = useTranslation('projectMode');
 
   // Don't render if no backpressure data or not active
@@ -96,7 +99,11 @@ export function BackpressureBanner({ backpressure, className }: BackpressureBann
           <SignalCard
             icon={<Clock className="h-4 w-4" />}
             label={t('readiness.backpressure.signals.avgLatency')}
-            value={signals.avgLatencyMs > 0 ? `${Math.round(signals.avgLatencyMs)}ms` : '-'}
+            value={
+              signals.avgLatencyMs > 0
+                ? `${Math.round(signals.avgLatencyMs)}ms`
+                : '-'
+            }
             isTriggered={triggeredBy?.includes('avg_latency')}
           />
         </div>

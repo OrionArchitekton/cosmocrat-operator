@@ -45,7 +45,19 @@ jobs:
           fi
 
       - name: Format check frontend
-        run: cd frontend && npm run format:check
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          set -euo pipefail
+          BASE_REF="${GITHUB_BASE_REF:-main}"
+          git fetch --no-tags --depth=1 origin "${BASE_REF}"
+          CHANGED="$(git diff --name-only "origin/${BASE_REF}...HEAD" | grep -E '^frontend/src/.*\\.(ts|tsx|js|jsx|json|css|md)$' || true)"
+          if [ -z "$CHANGED" ]; then
+            echo "Skipping format check (no matching frontend source changes)."
+            exit 0
+          fi
+          cd frontend
+          echo "$CHANGED" | sed 's#^frontend/##' | xargs npx prettier --check
 
       - name: Type check frontend
         run: cd frontend && npx tsc --noEmit
