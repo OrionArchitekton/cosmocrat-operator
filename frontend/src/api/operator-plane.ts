@@ -113,6 +113,24 @@ export interface IntentStatus {
   events: ChronicleEvent[];
 }
 
+type RawPatchArtifact = {
+  file_path: string;
+  operation: PatchArtifact['operation'];
+  content: string;
+  diff: string;
+};
+
+type RawChronicleEvent = {
+  event_id: string;
+  event_type: string;
+  timestamp: string;
+  receipt_id?: string;
+  operator_id: string;
+  session_id: string;
+  payload: Record<string, unknown>;
+  payload_hash: string;
+};
+
 // ============================================================
 // API Functions
 // ============================================================
@@ -185,7 +203,7 @@ export async function authorizeExecution(request: ExecutionRequest): Promise<Exe
     receiptId: data.receipt_id,
     status: data.status,
     artifacts: {
-      patches: data.artifacts?.patches?.map((p: any) => ({
+      patches: data.artifacts?.patches?.map((p: RawPatchArtifact) => ({
         filePath: p.file_path,
         operation: p.operation,
         content: p.content,
@@ -254,7 +272,7 @@ export async function getIntentStatus(receiptId: string): Promise<IntentStatus> 
     status: data.status,
     receiptId: data.receipt_id,
     eventCount: data.event_count,
-    events: data.events?.map((e: any) => ({
+    events: data.events?.map((e: RawChronicleEvent) => ({
       eventId: e.event_id,
       eventType: e.event_type,
       timestamp: e.timestamp,
@@ -279,7 +297,7 @@ export async function getChronicleEvents(receiptId: string): Promise<ChronicleEv
   }
   
   const data = await response.json();
-  return data.events?.map((e: any) => ({
+  return data.events?.map((e: RawChronicleEvent) => ({
     eventId: e.event_id,
     eventType: e.event_type,
     timestamp: e.timestamp,

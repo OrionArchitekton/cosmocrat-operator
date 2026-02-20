@@ -8,7 +8,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Activity, Clock, XCircle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Activity, Clock, XCircle } from 'lucide-react';
 import { BackpressureStatus } from '@/api/project-mode';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +25,7 @@ export function BackpressureBanner({ backpressure, className }: BackpressureBann
     return null;
   }
 
-  const { signals, triggeredBy, reason, since } = backpressure;
+  const { signals, triggeredBy, since } = backpressure;
 
   // Format the since timestamp if available
   const formattedSince = since ? formatTimeAgo(since) : null;

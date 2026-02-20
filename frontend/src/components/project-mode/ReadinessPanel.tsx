@@ -45,7 +45,7 @@ export function ReadinessPanel({
 
   // Get tickets that have explanations (blocked/waiting)
   const blockedTickets = Object.entries(explanations).filter(
-    ([_, reasons]) => reasons.length > 0
+    ([, reasons]) => reasons.length > 0
   );
 
   return (
