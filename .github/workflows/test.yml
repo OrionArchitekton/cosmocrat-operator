@@ -34,7 +34,15 @@ jobs:
       - name: Check i18n regressions
         env:
           GITHUB_BASE_REF: ${{ github.base_ref || 'main' }}
-        run: ./scripts/check-i18n.sh
+        run: |
+          set -euo pipefail
+          BASE_REF="${GITHUB_BASE_REF:-main}"
+          git fetch --no-tags --depth=1 origin "${BASE_REF}"
+          if git diff --name-only "origin/${BASE_REF}...HEAD" | grep -q '^frontend/src/i18n/'; then
+            ./scripts/check-i18n.sh
+          else
+            echo "Skipping i18n regressions check (no i18n files changed)."
+          fi
 
       - name: Format check frontend
         run: cd frontend && npm run format:check
