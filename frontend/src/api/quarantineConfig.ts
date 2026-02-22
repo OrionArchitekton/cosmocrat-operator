@@ -27,6 +27,12 @@ export type QuarantineConfigResult = {
 };
 
 let configCache: QuarantineConfigResult | null = null;
+const ALLOWED_SCHEMA_VERSIONS = new Set(['quarantine-config.v1']);
+const ALLOWED_MODES = new Set([
+  'operator-plane-v1',
+  'operator-plane-v1.1',
+  'vibe-kanban-full',
+]);
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
@@ -43,11 +49,14 @@ function isValidQuarantineConfig(
     return false;
   }
 
-  if (typeof value.schema_version !== 'string' || value.schema_version.length === 0) {
+  if (
+    typeof value.schema_version !== 'string' ||
+    !ALLOWED_SCHEMA_VERSIONS.has(value.schema_version)
+  ) {
     return false;
   }
 
-  if (typeof value.mode !== 'string' || value.mode.length === 0) {
+  if (typeof value.mode !== 'string' || !ALLOWED_MODES.has(value.mode)) {
     return false;
   }
 

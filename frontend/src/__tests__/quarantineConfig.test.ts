@@ -112,6 +112,48 @@ describe('fetchQuarantineConfig', () => {
     expect(result.error).toBe('remote_invalid_schema');
   });
 
+  it('falls back when schema_version is unsupported', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        valid: true,
+        config: {
+          ...VALID_REMOTE_CONFIG,
+          schema_version: 'quarantine-config.v2',
+        },
+      }),
+    }));
+
+    vi.stubGlobal('fetch', fetchMock as unknown as typeof fetch);
+
+    const result = await fetchQuarantineConfig({ endpoint: '/x' });
+
+    expect(result.source).toBe('fallback');
+    expect(result.error).toBe('remote_invalid_schema');
+  });
+
+  it('falls back when mode is unsupported', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        valid: true,
+        config: {
+          ...VALID_REMOTE_CONFIG,
+          mode: 'operator-plane-v2',
+        },
+      }),
+    }));
+
+    vi.stubGlobal('fetch', fetchMock as unknown as typeof fetch);
+
+    const result = await fetchQuarantineConfig({ endpoint: '/x' });
+
+    expect(result.source).toBe('fallback');
+    expect(result.error).toBe('remote_invalid_schema');
+  });
+
   it('falls back on timeout', async () => {
     const fetchMock = vi.fn((_input: string, init?: RequestInit) => {
       return new Promise<Response>((_resolve, reject) => {
