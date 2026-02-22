@@ -15,6 +15,7 @@ import { ChronicleDiffViewer } from './ChronicleDiffViewer';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, History, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useQuarantineConfig } from '@/hooks/useQuarantineConfig';
 
 interface OperatorPlanePanelProps {
   taskId?: string;
@@ -29,6 +30,8 @@ export function OperatorPlanePanel({
   branch = 'main',
   className,
 }: OperatorPlanePanelProps) {
+  const { loading: quarantineLoading, data: quarantineData } =
+    useQuarantineConfig();
   const {
     receiptId,
     gates,
@@ -46,6 +49,14 @@ export function OperatorPlanePanel({
   
   const hasStarted = gates.g1 === 'passed';
   const isComplete = gates.g4 === 'passed' || gates.g4 === 'failed';
+  const quarantineSource = quarantineLoading
+    ? 'loading'
+    : quarantineData?.source ?? 'fallback';
+  const fallbackReason = !quarantineLoading && !quarantineData
+    ? 'no_data'
+    : quarantineData?.source === 'fallback'
+      ? quarantineData.error
+      : undefined;
   
   return (
     <div className={cn('flex flex-col h-full', className)}>
@@ -53,6 +64,24 @@ export function OperatorPlanePanel({
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold">Operator Plane</h2>
+          <span
+            className={cn(
+              'px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide border',
+              quarantineSource === 'remote' &&
+                'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+              quarantineSource === 'fallback' &&
+                'bg-amber-500/15 text-amber-300 border-amber-500/30',
+              quarantineSource === 'loading' &&
+                'bg-muted text-muted-foreground border-border'
+            )}
+          >
+            Quarantine {quarantineSource}
+          </span>
+          {fallbackReason ? (
+            <span className="text-xs text-amber-300">
+              ({fallbackReason})
+            </span>
+          ) : null}
           {hasStarted && <GateStatusInline gates={gates} />}
         </div>
         
