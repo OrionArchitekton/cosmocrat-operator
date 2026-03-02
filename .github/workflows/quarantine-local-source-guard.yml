@@ -106,8 +106,16 @@ jobs:
             echo "Artifact path uses multiline YAML scalar; skipping secret scan."
             exit 0
           fi
-          shopt -s nullglob
-          matches=( $ARTIFACT_PATH )
+          if [[ "$ARTIFACT_PATH" == *"*"* || "$ARTIFACT_PATH" == *"?"* || "$ARTIFACT_PATH" == *"["* ]]; then
+            shopt -s nullglob
+            matches=( $ARTIFACT_PATH )
+          else
+            if [ -e "$ARTIFACT_PATH" ]; then
+              matches=( "$ARTIFACT_PATH" )
+            else
+              matches=()
+            fi
+          fi
           if [ ${#matches[@]} -eq 0 ]; then
             echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
             exit 0
