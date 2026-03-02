@@ -167,6 +167,8 @@ jobs:
           ignore_missing: true
 
       - name: Pre-upload secret scan
+        id: preupload_secret_scan_1
+        if: ${{ always() }}
         shell: bash
         run: |
           set -euo pipefail
@@ -470,6 +472,8 @@ jobs:
           rm -rf private_keys/
 
       - name: Pre-upload secret scan
+        id: preupload_secret_scan_2
+        if: ${{ always() }}
         shell: bash
         run: |
           set -euo pipefail
@@ -600,6 +604,8 @@ jobs:
           cp dist/vibe-kanban-review-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-review.zip
 
       - name: Pre-upload secret scan
+        id: preupload_secret_scan_3
+        if: ${{ always() }}
         shell: bash
         run: |
           set -euo pipefail

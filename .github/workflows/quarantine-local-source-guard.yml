@@ -96,6 +96,8 @@ jobs:
           node --test scripts/test-check-quarantine-local-source.js scripts/test-quarantine-deprecation-contract.js
 
       - name: Pre-upload secret scan
+        id: preupload_secret_scan_1
+        if: ${{ always() }}
         shell: bash
         run: |
           set -euo pipefail
@@ -127,7 +129,7 @@ jobs:
             gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
           done
       - name: Upload guard artifacts
-        if: always()
+        if: ${{ always() && steps.preupload_secret_scan_1.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: quarantine-local-source-guard-${{ steps.mode.outputs.mode }}
