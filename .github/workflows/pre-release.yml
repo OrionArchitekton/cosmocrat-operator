@@ -166,6 +166,10 @@ jobs:
           sourcemaps: "./frontend/dist"
           ignore_missing: true
 
+      - name: Pre-upload secret scan
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --no-git --source . --redact
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -438,6 +442,10 @@ jobs:
           rm -f certificate.p12
           rm -rf private_keys/
 
+      - name: Pre-upload secret scan
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --no-git --source . --redact
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
@@ -537,6 +545,10 @@ jobs:
           cp dist/vibe-kanban-mcp-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-mcp.zip
           cp dist/vibe-kanban-review-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-review.zip
 
+      - name: Pre-upload secret scan
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --no-git --source . --redact
       - name: Upload platform package artifact
         uses: actions/upload-artifact@v4
         with:
