@@ -171,6 +171,10 @@ jobs:
         run: |
           set -euo pipefail
           ARTIFACT_PATH="frontend/dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
           shopt -s nullglob
           matches=( $ARTIFACT_PATH )
           if [ ${#matches[@]} -eq 0 ]; then
@@ -184,7 +188,7 @@ jobs:
               echo "$BIN_DIR" >> "$GITHUB_PATH"
             fi
             tmp_dir="$(mktemp -d)"
-            trap "rm -rf "$tmp_dir"" EXIT
+            trap 'rm -rf "$tmp_dir"' EXIT
             curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
             tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
             install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
@@ -470,6 +474,10 @@ jobs:
         run: |
           set -euo pipefail
           ARTIFACT_PATH="dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
           shopt -s nullglob
           matches=( $ARTIFACT_PATH )
           if [ ${#matches[@]} -eq 0 ]; then
@@ -483,7 +491,7 @@ jobs:
               echo "$BIN_DIR" >> "$GITHUB_PATH"
             fi
             tmp_dir="$(mktemp -d)"
-            trap "rm -rf "$tmp_dir"" EXIT
+            trap 'rm -rf "$tmp_dir"' EXIT
             curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
             tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
             install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
@@ -596,6 +604,10 @@ jobs:
         run: |
           set -euo pipefail
           ARTIFACT_PATH="npx-cli/dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
           shopt -s nullglob
           matches=( $ARTIFACT_PATH )
           if [ ${#matches[@]} -eq 0 ]; then
@@ -609,7 +621,7 @@ jobs:
               echo "$BIN_DIR" >> "$GITHUB_PATH"
             fi
             tmp_dir="$(mktemp -d)"
-            trap "rm -rf "$tmp_dir"" EXIT
+            trap 'rm -rf "$tmp_dir"' EXIT
             curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
             tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
             install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
