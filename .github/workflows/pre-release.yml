@@ -178,7 +178,7 @@ jobs:
             exit 0
           fi
           if ! command -v gitleaks >/dev/null 2>&1; then
-            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.3
           fi
           for source_path in "${matches[@]}"; do
             gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
@@ -467,7 +467,7 @@ jobs:
             exit 0
           fi
           if ! command -v gitleaks >/dev/null 2>&1; then
-            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.3
           fi
           for source_path in "${matches[@]}"; do
             gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
@@ -583,7 +583,7 @@ jobs:
             exit 0
           fi
           if ! command -v gitleaks >/dev/null 2>&1; then
-            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.3
           fi
           for source_path in "${matches[@]}"; do
             gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
