@@ -95,8 +95,49 @@ jobs:
         run: |
           node --test scripts/test-check-quarantine-local-source.js scripts/test-quarantine-deprecation-contract.js
 
+      - name: Pre-upload secret scan
+        id: preupload_secret_scan_1
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="artifacts/quarantine_local_source_guard_receipt.json"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
+          if [[ "$ARTIFACT_PATH" == *"*"* || "$ARTIFACT_PATH" == *"?"* || "$ARTIFACT_PATH" == *"["* ]]; then
+            shopt -s nullglob
+            matches=( $ARTIFACT_PATH )
+          else
+            if [ -e "$ARTIFACT_PATH" ]; then
+              matches=( "$ARTIFACT_PATH" )
+            else
+              matches=()
+            fi
+          fi
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            BIN_DIR="$HOME/.local/bin"
+            mkdir -p "$BIN_DIR"
+            if [ -n "${GITHUB_PATH:-}" ]; then
+              echo "$BIN_DIR" >> "$GITHUB_PATH"
+            fi
+            tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$tmp_dir"' EXIT
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
+            tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
+            install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
+            export PATH="$BIN_DIR:$PATH"
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload guard artifacts
-        if: always()
+        if: ${{ always() && steps.preupload_secret_scan_1.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: quarantine-local-source-guard-${{ steps.mode.outputs.mode }}

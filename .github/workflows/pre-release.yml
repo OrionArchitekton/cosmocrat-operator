@@ -166,8 +166,50 @@ jobs:
           sourcemaps: "./frontend/dist"
           ignore_missing: true
 
+      - name: Pre-upload secret scan
+        id: preupload_secret_scan_1
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="frontend/dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
+          if [[ "$ARTIFACT_PATH" == *"*"* || "$ARTIFACT_PATH" == *"?"* || "$ARTIFACT_PATH" == *"["* ]]; then
+            shopt -s nullglob
+            matches=( $ARTIFACT_PATH )
+          else
+            if [ -e "$ARTIFACT_PATH" ]; then
+              matches=( "$ARTIFACT_PATH" )
+            else
+              matches=()
+            fi
+          fi
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            BIN_DIR="$HOME/.local/bin"
+            mkdir -p "$BIN_DIR"
+            if [ -n "${GITHUB_PATH:-}" ]; then
+              echo "$BIN_DIR" >> "$GITHUB_PATH"
+            fi
+            tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$tmp_dir"' EXIT
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
+            tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
+            install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
+            export PATH="$BIN_DIR:$PATH"
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_1.outcome == 'success' }}
         with:
           name: frontend-dist
           path: frontend/dist/
@@ -438,8 +480,50 @@ jobs:
           rm -f certificate.p12
           rm -rf private_keys/
 
+      - name: Pre-upload secret scan
+        id: preupload_secret_scan_2
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
+          if [[ "$ARTIFACT_PATH" == *"*"* || "$ARTIFACT_PATH" == *"?"* || "$ARTIFACT_PATH" == *"["* ]]; then
+            shopt -s nullglob
+            matches=( $ARTIFACT_PATH )
+          else
+            if [ -e "$ARTIFACT_PATH" ]; then
+              matches=( "$ARTIFACT_PATH" )
+            else
+              matches=()
+            fi
+          fi
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            BIN_DIR="$HOME/.local/bin"
+            mkdir -p "$BIN_DIR"
+            if [ -n "${GITHUB_PATH:-}" ]; then
+              echo "$BIN_DIR" >> "$GITHUB_PATH"
+            fi
+            tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$tmp_dir"' EXIT
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
+            tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
+            install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
+            export PATH="$BIN_DIR:$PATH"
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_2.outcome == 'success' }}
         with:
           name: backend-binary-${{ matrix.name }}
           path: dist/
@@ -537,8 +621,50 @@ jobs:
           cp dist/vibe-kanban-mcp-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-mcp.zip
           cp dist/vibe-kanban-review-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-review.zip
 
+      - name: Pre-upload secret scan
+        id: preupload_secret_scan_3
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="npx-cli/dist/"
+          if [ "$ARTIFACT_PATH" = "|" ] || [ "$ARTIFACT_PATH" = ">" ]; then
+            echo "Artifact path uses multiline YAML scalar; skipping secret scan."
+            exit 0
+          fi
+          if [[ "$ARTIFACT_PATH" == *"*"* || "$ARTIFACT_PATH" == *"?"* || "$ARTIFACT_PATH" == *"["* ]]; then
+            shopt -s nullglob
+            matches=( $ARTIFACT_PATH )
+          else
+            if [ -e "$ARTIFACT_PATH" ]; then
+              matches=( "$ARTIFACT_PATH" )
+            else
+              matches=()
+            fi
+          fi
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            BIN_DIR="$HOME/.local/bin"
+            mkdir -p "$BIN_DIR"
+            if [ -n "${GITHUB_PATH:-}" ]; then
+              echo "$BIN_DIR" >> "$GITHUB_PATH"
+            fi
+            tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$tmp_dir"' EXIT
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz -o "$tmp_dir/gitleaks.tgz"
+            tar -xzf "$tmp_dir/gitleaks.tgz" -C "$tmp_dir"
+            install -m 0755 "$tmp_dir/gitleaks" "$BIN_DIR/gitleaks"
+            export PATH="$BIN_DIR:$PATH"
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload platform package artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_3.outcome == 'success' }}
         with:
           name: npx-platform-${{ matrix.name }}
           path: npx-cli/dist/
