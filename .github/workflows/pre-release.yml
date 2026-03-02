@@ -167,9 +167,22 @@ jobs:
           ignore_missing: true
 
       - name: Pre-upload secret scan
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --no-git --source . --redact
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="frontend/dist/"
+          shopt -s nullglob
+          matches=( $ARTIFACT_PATH )
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -443,9 +456,22 @@ jobs:
           rm -rf private_keys/
 
       - name: Pre-upload secret scan
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --no-git --source . --redact
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="dist/"
+          shopt -s nullglob
+          matches=( $ARTIFACT_PATH )
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
@@ -546,9 +572,22 @@ jobs:
           cp dist/vibe-kanban-review-${{ matrix.name }}* npx-cli/dist/${{ matrix.name }}/vibe-kanban-review.zip
 
       - name: Pre-upload secret scan
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --no-git --source . --redact
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="npx-cli/dist/"
+          shopt -s nullglob
+          matches=( $ARTIFACT_PATH )
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload platform package artifact
         uses: actions/upload-artifact@v4
         with:

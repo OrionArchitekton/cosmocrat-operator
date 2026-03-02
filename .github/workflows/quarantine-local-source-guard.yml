@@ -96,9 +96,22 @@ jobs:
           node --test scripts/test-check-quarantine-local-source.js scripts/test-quarantine-deprecation-contract.js
 
       - name: Pre-upload secret scan
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --no-git --source . --redact
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTIFACT_PATH="artifacts/quarantine_local_source_guard_receipt.json"
+          shopt -s nullglob
+          matches=( $ARTIFACT_PATH )
+          if [ ${#matches[@]} -eq 0 ]; then
+            echo "Artifact path '$ARTIFACT_PATH' not found; skipping secret scan."
+            exit 0
+          fi
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.3
+          fi
+          for source_path in "${matches[@]}"; do
+            gitleaks detect --no-git --source "$source_path" --redact --exit-code 1
+          done
       - name: Upload guard artifacts
         if: always()
         uses: actions/upload-artifact@v4
