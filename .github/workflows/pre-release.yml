@@ -209,6 +209,7 @@ jobs:
           done
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_1.outcome == 'success' }}
         with:
           name: frontend-dist
           path: frontend/dist/
@@ -522,6 +523,7 @@ jobs:
           done
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_2.outcome == 'success' }}
         with:
           name: backend-binary-${{ matrix.name }}
           path: dist/
@@ -662,6 +664,7 @@ jobs:
           done
       - name: Upload platform package artifact
         uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.preupload_secret_scan_3.outcome == 'success' }}
         with:
           name: npx-platform-${{ matrix.name }}
           path: npx-cli/dist/
