@@ -1,5 +1,9 @@
 # Cosmocrat Operator (archived)
 
+> Legacy. This repo is from the earlier Cosmocrat governance platform and is
+> not part of the current Cosmocrat OS release. Current tools:
+> <https://www.cosmocrat.ai/tools>
+
 Archived prototype of a governed, human-in-the-loop operator UI for AI coding agents.
 
 ![License](https://img.shields.io/badge/license-Apache_2.0-blue)
